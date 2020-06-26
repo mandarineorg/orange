@@ -32,4 +32,9 @@ export class CoreUtils {
         }
     }
 
+    public static getStandardDate() {
+        var today = new Date();
+        return today.toISOString().substring(0, 10);
+    }
+
 }

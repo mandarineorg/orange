@@ -1,6 +1,6 @@
+import { bold, yellow } from "https://deno.land/std/fmt/colors.ts";
 import { Table } from "./table.ts";
 import { CoreUtils } from "./utils/core.utils.ts";
-import { bold ,yellow } from "https://deno.land/std/fmt/colors.ts";
 export namespace Orange {
 
     export const AsyncFunction = (async () => {}).constructor;
@@ -37,6 +37,8 @@ export namespace Orange {
 
     export interface OrangeConfiguration {
         testsFolder?: string;
+        showExceptions?: boolean;
+
     }
 
     export interface Options {
@@ -55,7 +57,8 @@ export namespace Orange {
         }
 
         export const DEFAULT_ORANGE_CONFIG: OrangeConfiguration = {
-            testsFolder: "./tests/"
+            testsFolder: "./tests/[date]/",
+            showExceptions: false
         }
     }
 
@@ -139,7 +142,8 @@ export namespace Orange {
                 if(!testSuiteConfig.generateReport) return;
                 tables.push(`${testSuiteConfig.testSuiteName}\n${Table(this.getTableContent(item), true, false, "Test ID")}\n`);
             });
-            Deno.writeTextFileSync(`${this.getTestingFolder()}/result.txt`, <string>tables.join(`\n`));
+
+            Deno.writeTextFileSync(`${this.getTestingFolder()}/test-result.txt`, <string>tables.join(`\n`));
 
             return tables;
         }
@@ -150,6 +154,10 @@ export namespace Orange {
                     let config;
                     try {
                         config = JSON.parse(new TextDecoder().decode(Deno.readFileSync('orange-test.json')));
+
+                        if(config.testsFolder == undefined) config.testsFolder = Defaults.DEFAULT_ORANGE_CONFIG.testsFolder;
+                        if(config.showExceptions == undefined) config.showExceptions = Defaults.DEFAULT_ORANGE_CONFIG.showExceptions;
+                        
                     } catch(error) {
                         console.log(yellow(`${bold("Warning: `orange-test.json`")} could not be read. Default values are now used`));
                         config = Defaults.DEFAULT_ORANGE_CONFIG;
@@ -166,8 +174,15 @@ export namespace Orange {
 
         public static getTestingFolder() {
             let config = this.getOrangeConfig();
-            if(!CoreUtils.fileDirExists(config.testsFolder)) Deno.mkdirSync(config.testsFolder, { recursive: true });
-            return this.getOrangeConfig().testsFolder;
+            let testFolder = this.parseKeywords(config.testsFolder);
+            if(!CoreUtils.fileDirExists(testFolder)) Deno.mkdirSync(testFolder, { recursive: true });
+            return testFolder;
+        }
+
+        public static parseKeywords(input: string) {
+            input = input.replace("[date]", CoreUtils.getStandardDate());
+            input = input.replace("[timestamp]", new Date().valueOf().toString());
+            return input;
         }
 
     }

@@ -48,7 +48,11 @@ export const TestProxy = async (testMethod: Function, testSuiteClass: any, testS
         if(testStatus.passed) {
             return;
         } else {
-            throw "";
+            if(!Orange.Core.getOrangeConfig().showExceptions) {
+                throw "";
+            } else {
+                throw testStatus.error;
+            }
         }
     }
 }
