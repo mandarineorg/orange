@@ -139,8 +139,14 @@ export namespace Orange {
             availableTestSuites.forEach((item) => {
                 let testSuiteConfig = this.getTestSuiteConfig(item);
                 if(!testSuiteConfig.generateReport) return;
-                let table = this.getTableContent(item);
-                tables.push(`${testSuiteConfig.testSuiteName}\n${(table.length == 0) ? " - No tests were found or they were ignored" : Table(table, true, false, "Test ID")}\n`);
+                let tableContent = this.getTableContent(item);
+                tableContent = tableContent.map((item) => {
+                    item["Error Message"] = item["Error Message"].replace(/(\r\n|\n|\r)/gm, "");
+                    return item;
+                })
+                let table = Table(tableContent, true, false, "Test ID");
+                table = (<string>table).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");
+                tables.push(`${testSuiteConfig.testSuiteName}\n${(tableContent.length == 0) ? " - No tests were found or they were ignored" : table}\n`);
             });
 
             tables.push(`\n`);

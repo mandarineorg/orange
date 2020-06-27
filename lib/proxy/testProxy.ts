@@ -1,12 +1,9 @@
-import { setColorEnabled } from "https://deno.land/std/fmt/colors.ts";
 import { Orange } from "../core.ns.ts";
 import { CoreUtils } from "../utils/core.utils.ts";
 
 const processLastTest = () => {
     if((Orange.Core.testsMetadata.numberOfTests - Orange.Core.testsMetadata.numberOfTestsIgnored) == Orange.Core.testsMetadata.numberOfTestsRan) {
-        setColorEnabled(false);
         Orange.Core.generateTable();
-        setColorEnabled(true);
     }
 }
 
@@ -22,8 +19,9 @@ export const TestProxy = async (testMethod: Function, testSuiteClass: any, testS
         testSuiteName: undefined,
         time: undefined
     }
-
+    
     let startTime = Date.now();
+
     try {
         if(isAsync) {
             await testMethod();

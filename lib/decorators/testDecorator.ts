@@ -1,4 +1,4 @@
-import { yellow } from "https://deno.land/std/fmt/colors.ts";
+import { setColorEnabled, yellow } from "https://deno.land/std/fmt/colors.ts";
 import { Orange } from "../core.ns.ts";
 import { TestProxy } from "../proxy/testProxy.ts";
 
@@ -16,11 +16,11 @@ export const Test = (options: Orange.TestOptions) => {
         let testSuiteConfig = Orange.Core.getTestSuiteConfig(target);
         let ignore = options.ignore || testSuiteConfig.ignore; 
         if(ignore) Orange.Core.testsMetadata.numberOfTestsIgnored++;
-
         Deno.test({
             name: testName,
             ignore: ignore,
             fn: async () => {
+                setColorEnabled(false);
                 (await TestProxy(testMethod, target, testSuiteConfig, testMethod instanceof Orange.AsyncFunction, options, propertyKey))();
             }
         });

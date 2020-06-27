@@ -1,0 +1,12 @@
+{
+    "name": "Orange",
+    "description": "A decorator-driven testing library for Deno & mandarine-powered applications",
+    "version": "0.0.1",
+    "entry": "./mod.ts",
+    "stable": true,
+    "unlisted": false,
+    "repository": "https://github.com/mandarineorg/orange",
+    "files": [
+        "./**/*"
+    ]
+}
