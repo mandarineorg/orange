@@ -49,8 +49,6 @@ export namespace Orange {
 
     export namespace Defaults {
 
-        export const DEFAULT_TESTING_FOLDER = "./tests/";
-
         export const DEFAULT_OPTIONS: Options = {
             ignore: false,
             generateReport: true
