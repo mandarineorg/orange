@@ -85,7 +85,6 @@ export namespace Orange {
             } catch(error) {
                 instance = new classSource();
             }
-
             if(!this.testSuites.has(classSource)) this.testSuites.set(classSource, instance);
         }
 
@@ -102,8 +101,9 @@ export namespace Orange {
         }
 
         public static getTestSuiteConfig(classSource: any): Options {
-            let configFromClass: Options = this.testSuites.get(classSource)[TEST_SUITE_CLASS_KEY];
-            if(!configFromClass) {
+            let options = this.testSuites.get(classSource)[TEST_SUITE_CLASS_KEY];
+            let configFromClass: Options = Object.assign({}, options);
+            if(!options) {
                 configFromClass = this.setTestSuiteConfig(configFromClass, classSource);
             }
             return configFromClass;

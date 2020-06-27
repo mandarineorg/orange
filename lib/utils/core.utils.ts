@@ -18,9 +18,11 @@ export class CoreUtils {
     }
 
     public static getClassName(target: any): string {
-        let className:string = target.constructor.name;
-        if(className === "Function") return target.name;
-        return className;
+        try{
+            return target.constructor.name;
+        } catch(error) {
+            return target.name;
+        }
     }
 
     public static fileDirExists(path: string): boolean  {
