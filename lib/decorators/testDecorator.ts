@@ -9,16 +9,17 @@ export const Test = (options: Orange.TestOptions) => {
             [${yellow(testName)}]`;
 
         // Define test  
-        if(options.ignore == undefined || options.ignore == false) Orange.Core.testsMetadata.numberOfTests++;
-        
+        Orange.Core.testsMetadata.numberOfTests++;
         Orange.Core.addTestSuite(target);
 
         let testMethod = Orange.Core.getTestSuite(target)[propertyKey];
         let testSuiteConfig = Orange.Core.getTestSuiteConfig(target);
+        let ignore = options.ignore || testSuiteConfig.ignore; 
+        if(ignore) Orange.Core.testsMetadata.numberOfTestsIgnored++;
 
         Deno.test({
             name: testName,
-            ignore: options.ignore || testSuiteConfig.ignore,
+            ignore: ignore,
             fn: async () => {
                 (await TestProxy(testMethod, target, testSuiteConfig, testMethod instanceof Orange.AsyncFunction, options, propertyKey))();
             }

@@ -3,7 +3,7 @@ import { Orange } from "../core.ns.ts";
 import { CoreUtils } from "../utils/core.utils.ts";
 
 const processLastTest = () => {
-    if(Orange.Core.testsMetadata.numberOfTests == Orange.Core.testsMetadata.numberOfTestsRan) {
+    if((Orange.Core.testsMetadata.numberOfTests - Orange.Core.testsMetadata.numberOfTestsIgnored) == Orange.Core.testsMetadata.numberOfTestsRan) {
         setColorEnabled(false);
         Orange.Core.generateTable();
         setColorEnabled(true);
@@ -16,7 +16,7 @@ export const TestProxy = async (testMethod: Function, testSuiteClass: any, testS
         testSuiteClass: testSuiteClass,
         name: testOptions.name,
         description: testOptions.description,
-        ignore: testOptions.ignore,
+        ignore: testOptions.ignore || testSuiteConfig.ignore,
         passed: false,
         error: undefined,
         testSuiteName: undefined,

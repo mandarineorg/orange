@@ -66,7 +66,8 @@ export namespace Orange {
 
         public static testsMetadata = {
             numberOfTests: 0,
-            numberOfTestsRan: 0
+            numberOfTestsRan: 0,
+            numberOfTestsIgnored: 0
         };
 
         public static tests: Map<Function, TestStatus> = new Map<Function, TestStatus>();
@@ -138,8 +139,13 @@ export namespace Orange {
             availableTestSuites.forEach((item) => {
                 let testSuiteConfig = this.getTestSuiteConfig(item);
                 if(!testSuiteConfig.generateReport) return;
-                tables.push(`${testSuiteConfig.testSuiteName}\n${Table(this.getTableContent(item), true, false, "Test ID")}\n`);
+                let table = this.getTableContent(item);
+                tables.push(`${testSuiteConfig.testSuiteName}\n${(table.length == 0) ? " - No tests were found or they were ignored" : Table(table, true, false, "Test ID")}\n`);
             });
+
+            tables.push(`\n`);
+            let tests = Array.from(this.tests.values());
+            tables.push(`| Total Tests: ${this.testsMetadata.numberOfTests} |  Ran: ${this.testsMetadata.numberOfTestsRan} | Ignored: ${this.testsMetadata.numberOfTestsIgnored} | Passed: ${tests.filter((item) => item.passed).length} | Failed: ${tests.filter((item) => !item.passed).length} |`)
 
             Deno.writeTextFileSync(`${this.getTestingFolder()}/test-result.txt`, <string>tables.join(`\n`));
 

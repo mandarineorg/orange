@@ -6,7 +6,7 @@ export class Tests {
     constructor() {
         Orange.setOptions(this, {
             testSuiteName: "My set of tests",
-            ignore: false
+            ignore: true
         })
     }
 
