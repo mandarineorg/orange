@@ -20,9 +20,7 @@ export const Test = (options: Orange.TestOptions) => {
             name: testName,
             ignore: ignore,
             fn: async () => {
-                setColorEnabled(false);
                 (await TestProxy(testMethod, target, testSuiteConfig, testMethod instanceof Orange.AsyncFunction, options, propertyKey))();
-                setColorEnabled(true);
             }
         });
     }
