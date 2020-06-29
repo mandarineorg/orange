@@ -57,7 +57,7 @@ The `@Test` decorator as mentioned before handles the creation of the proxy betw
 
 ### Example
 ```typescript
-import { Test, Orange } from "https://x.nest.land/Orange@0.0.1/mod.ts";
+import { Test, Orange } from "https://x.nest.land/Orange@0.2.1/mod.ts";
 
 export class Tests {
 
