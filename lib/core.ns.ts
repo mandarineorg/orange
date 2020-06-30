@@ -45,6 +45,18 @@ export namespace Orange {
         testSuiteName?: string;
         ignore?: boolean;
         generateReport?: boolean;
+        hooks?: {
+            beforeAll?: Function;
+            afterAll?: Function;
+            beforeEach?: Function;
+            afterEach?: Function;
+        }
+    }
+
+    export interface TestSuiteStats {
+        numberOfTests: number,
+        numberOfTestsRan: number,
+        numberOfTestsIgnored: number
     }
 
     export namespace Defaults {
@@ -64,28 +76,27 @@ export namespace Orange {
 
         public static orangeConfiguration: OrangeConfiguration;
 
-        public static testsMetadata = {
+        public static testsMetadata: TestSuiteStats = {
             numberOfTests: 0,
             numberOfTestsRan: 0,
             numberOfTestsIgnored: 0
         };
 
+        public static testSuitesMetadata: Map<any, TestSuiteStats> = new Map<any, TestSuiteStats>();
         public static tests: Map<Function, TestStatus> = new Map<Function, TestStatus>();
-        public static testSuites: Map<any, any> = new Map<any, any>();
+        public static testSuites: Map<any, any> = new Map<any, any>(); 
 
         public static addTest(testMethod: Function, status: TestStatus) {
             if(!this.tests.has(testMethod)) this.tests.set(testMethod, status);
         }
 
         public static addTestSuite(classSource: any) {
-            let instance;
-
             try {
-                instance = new classSource.constructor();
+                let instance = new classSource.constructor();
+                if(!this.testSuites.has(classSource)) this.testSuites.set(classSource, instance);
             } catch(error) {
-                instance = new classSource();
+                throw error;
             }
-            if(!this.testSuites.has(classSource)) this.testSuites.set(classSource, instance);
         }
 
         public static getTestSuite(classSource: any) {
@@ -97,7 +108,38 @@ export namespace Orange {
             if(options.testSuiteName == undefined) options.testSuiteName = CoreUtils.getClassName(classSource);
             if(options.ignore == undefined) options.ignore = Orange.Defaults.DEFAULT_OPTIONS.ignore;
             if(options.generateReport == undefined) options.generateReport = Orange.Defaults.DEFAULT_OPTIONS.generateReport;
+
+            if(options?.hooks?.afterAll instanceof AsyncFunction
+                || options?.hooks?.afterEach instanceof AsyncFunction
+                    || options?.hooks?.beforeAll instanceof AsyncFunction
+                        || options?.hooks?.beforeEach instanceof AsyncFunction) throw "\n\nTesting Hooks cannot be `async`\nMake sure your hooks do not have the keyworkd `async`\n";
             return options;
+        }
+        
+        public static updateTestSuiteStats(testSuiteClass: any, statToUpdate: "NumTests" | "NumTestsRan" | "NumTestsIgnored") {
+            if(!this.testSuitesMetadata.has(testSuiteClass)) {
+                this.testSuitesMetadata.set(testSuiteClass, {
+                    numberOfTests: 0,
+                    numberOfTestsRan: 0,
+                    numberOfTestsIgnored: 0
+                });
+            }
+
+            switch(statToUpdate) {
+                case "NumTests": 
+                this.testSuitesMetadata.get(testSuiteClass).numberOfTests++;
+                break;
+                case "NumTestsRan": 
+                this.testSuitesMetadata.get(testSuiteClass).numberOfTestsRan++;
+                break;
+                case "NumTestsIgnored": 
+                this.testSuitesMetadata.get(testSuiteClass).numberOfTestsIgnored++;
+                break;
+            }
+        }
+
+        public static getTestSuiteStats(testSuiteClass: any): TestSuiteStats {
+            return this.testSuitesMetadata.get(testSuiteClass);
         }
 
         public static getTestSuiteConfig(classSource: any): Options {
@@ -193,6 +235,10 @@ export namespace Orange {
             input = input.replace("[date]", CoreUtils.getStandardDate());
             input = input.replace("[timestamp]", new Date().valueOf().toString());
             return input;
+        }
+
+        public static isLastTest(totalTests: number, testsIgnored: number, testsRan: number): boolean {
+            return (totalTests - testsIgnored) == testsRan;
         }
 
     }
