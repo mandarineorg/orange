@@ -57,7 +57,7 @@ The `@Test` decorator as mentioned before handles the creation of the proxy betw
 
 ### Example
 ```typescript
-import { Test, Orange } from "https://x.nest.land/Orange@0.2.1/mod.ts";
+import { Test, Orange } from "https://x.nest.land/Orange@0.2.2/mod.ts";
 
 export class Tests {
 
@@ -108,6 +108,15 @@ You can set your custom configuration by adding using `Orange.setOptions` in the
 - generateReport
     - Conditional to decide whether the test suite results should be added to the final report file
     - **Default**: true
+- hooks
+    - beforeAll: `Function`
+        - Hook to be executed before all tests
+    - afterAll: `Function`
+        - Hook to be executed after all tests
+    - beforeEach: `Function`
+        - Hook to be executed before each test
+    - afterEach: `Function`
+        - Hook to be executed after each test
 ```typescript
 export class Tests {
 
@@ -120,6 +129,28 @@ export class Tests {
     }
 }
 ```
+### Hooks
+Orange allows you the use of testing hooks. Testing hooks are actions that can be executed _before all tests, after all tests, after each test or before each test._ **Note** that hooks **must not** be asynchronous.  
+In order to use hooks, as shown above, they are part of the test suite configuration which means we configure them in our constructor by calling `Orange.setOptions`.
+```typescript
+export class Tests {
+
+    constructor() {
+        Orange.setOptions(this, {
+            testSuiteName: "My set of tests",
+            ignore: false,
+            generateReport: true,
+            hooks: {
+                beforeAll: () => console.log("Before all"),
+                afterAll: () => console.log("After all"),
+                beforeEach: () => console.log("Before each"),
+                afterEach: () => console.log("After each")
+            }
+        })
+    }
+}
+```
+
 # Orange Configuration
 By creating a file called `orange-test.json` you can decide some of the behaviors Orange uses under the hood.
 `orange-test.json` must contain a json which must follow `Orange.Core.OrangeConfiguration`

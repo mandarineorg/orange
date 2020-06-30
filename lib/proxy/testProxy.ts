@@ -1,14 +1,27 @@
+import { setColorEnabled } from "https://deno.land/std/fmt/colors.ts";
 import { Orange } from "../core.ns.ts";
 import { CoreUtils } from "../utils/core.utils.ts";
-import { setColorEnabled } from "https://deno.land/std/fmt/colors.ts";
 
-const processLastTest = () => {
-    if((Orange.Core.testsMetadata.numberOfTests - Orange.Core.testsMetadata.numberOfTestsIgnored) == Orange.Core.testsMetadata.numberOfTestsRan) {
+const processLastTest = (testSuiteClass: any, testSuiteConfig: Orange.Options) => {
+    // Process all LAST TEST in the current test suite
+    const testSuiteStat = Orange.Core.getTestSuiteStats(testSuiteClass);
+    if(testSuiteClass) {
+       if(Orange.Core.isLastTest(testSuiteStat.numberOfTests, testSuiteStat.numberOfTestsIgnored, testSuiteStat.numberOfTestsRan)) {
+            let afterAllHook = testSuiteConfig.hooks?.afterAll;
+            let afterEach = testSuiteConfig.hooks?.afterEach;
+
+            if(afterEach) afterEach();
+            if(afterAllHook) afterAllHook();
+       }
+    }
+
+    // Process all LAST TESTS among all Test Suites
+    if(Orange.Core.isLastTest(Orange.Core.testsMetadata.numberOfTests, Orange.Core.testsMetadata.numberOfTestsIgnored, Orange.Core.testsMetadata.numberOfTestsRan)) {
         Orange.Core.generateTable();
     }
 }
 
-export const TestProxy = async (testMethod: Function, testSuiteClass: any, testSuiteConfig: Orange.Options, isAsync: boolean, testOptions: Orange.TestOptions, methodName: string) => {
+export const TestProxy = async (testMethod: Function, testSuiteClass: any, testSuiteConfig: Orange.Options, testOptions: Orange.TestOptions, methodName: string) => {
 
     let testStatus: Orange.TestStatus = {
         testSuiteClass: testSuiteClass,
@@ -24,13 +37,9 @@ export const TestProxy = async (testMethod: Function, testSuiteClass: any, testS
     let startTime = Date.now();
 
     setColorEnabled(false);
+    let handler = Orange.Core.getTestSuite(testSuiteClass);
     try {
-        if(isAsync) {
-            await testMethod();
-        } else {
-            testMethod();
-        }
-
+        await handler[methodName]();
         testStatus.passed = true;
     } catch(error) {
         testStatus.error = error;
@@ -44,7 +53,8 @@ export const TestProxy = async (testMethod: Function, testSuiteClass: any, testS
 
     return () => {
         Orange.Core.testsMetadata.numberOfTestsRan++;
-        processLastTest();
+        Orange.Core.updateTestSuiteStats(testSuiteClass, "NumTestsRan");
+        processLastTest(testSuiteClass, testSuiteConfig);
         Deno.stdout.writeSync(new TextEncoder().encode(CoreUtils.formatFinalTestName(testOptions.description, methodName)));
         if(testStatus.passed) {
             return;
