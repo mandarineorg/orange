@@ -25,7 +25,7 @@ export const TestProxy = async (testMethod: Function, testSuiteClass: any, testS
 
     let testStatus: Orange.TestStatus = {
         testSuiteClass: testSuiteClass,
-        name: testOptions.name,
+        name: testOptions.name || methodName,
         description: testOptions.description,
         ignore: testOptions.ignore || testSuiteConfig.ignore,
         passed: false,

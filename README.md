@@ -57,7 +57,7 @@ The `@Test` decorator as mentioned before handles the creation of the proxy betw
 
 ### Example
 ```typescript
-import { Test, Orange } from "https://x.nest.land/Orange@0.2.2/mod.ts";
+import { Test, Orange } from "https://x.nest.land/Orange@0.2.3/mod.ts";
 
 export class Tests {
 
@@ -185,11 +185,11 @@ MathTests
 └─────────┴──────────────┴──────────────────────────┴────────┴────────────┴─────────────┴───────────────┴──────┘
 
 StringTests
-┌─────────┬───────────┬─────────────────────────┬────────┬─────────────┬────────────────┬──────────────────────────────────────────────────────────────────────────────────┬──────┐
-│ Test ID │   Name    │       Description       │ Status │ Suite Name  │  Error Class   │                                  Error Message                                   │ Time │
-├─────────┼───────────┼─────────────────────────┼────────┼─────────────┼────────────────┼──────────────────────────────────────────────────────────────────────────────────┼──────┤
-│    0    │ undefined │ Elon Musk is Jeff bezos │ FAILED │ StringTests │ AssertionError │ Values are not equal:    [Diff] Actual / Expected-   "Elon Musk"+   "Jeff Bezos" │ 1ms  │
-└─────────┴───────────┴─────────────────────────┴────────┴─────────────┴────────────────┴──────────────────────────────────────────────────────────────────────────────────┴──────┘
+┌─────────┬────────────────────┬─────────────────────────┬────────┬─────────────┬────────────────┬──────────────────────────────────────────────────────────────────────────────────┬──────┐
+│ Test ID │        Name        │       Description       │ Status │ Suite Name  │  Error Class   │                                  Error Message                                   │ Time │
+├─────────┼────────────────────┼─────────────────────────┼────────┼─────────────┼────────────────┼──────────────────────────────────────────────────────────────────────────────────┼──────┤
+│    0    │ elonIsNotJeffBezos │ Elon Musk is Jeff bezos │ FAILED │ StringTests │ AssertionError │ Values are not equal:    [Diff] Actual / Expected-   "Elon Musk"+   "Jeff Bezos" │ 2ms  │
+└─────────┴────────────────────┴─────────────────────────┴────────┴─────────────┴────────────────┴──────────────────────────────────────────────────────────────────────────────────┴──────┘
 
 | Total Tests: 4 |  Ran: 3 | Ignored: 1 | Passed: 2 | Failed: 1 |
 ```
