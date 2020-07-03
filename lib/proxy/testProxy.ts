@@ -21,7 +21,7 @@ const processLastTest = (testSuiteClass: any, testSuiteConfig: Orange.Options) =
     }
 }
 
-export const TestProxy = async (testMethod: Function, testSuiteClass: any, testSuiteConfig: Orange.Options, testOptions: Orange.TestOptions, methodName: string) => {
+function getTestStatus(testSuiteClass: any, testSuiteConfig: Orange.Options, testOptions: Orange.TestOptions, methodName: string) {
 
     let testStatus: Orange.TestStatus = {
         testSuiteClass: testSuiteClass,
@@ -33,6 +33,31 @@ export const TestProxy = async (testMethod: Function, testSuiteClass: any, testS
         testSuiteName: undefined,
         time: undefined
     }
+
+    return testStatus;
+}
+
+function denoTest(testStatus: Orange.TestStatus, testSuiteClass: any, testSuiteConfig: Orange.Options, testOptions: Orange.TestOptions, methodName: string): Function {
+    return () => {
+        Orange.Core.testsMetadata.numberOfTestsRan++;
+        Orange.Core.updateTestSuiteStats(testSuiteClass, "NumTestsRan");
+        processLastTest(testSuiteClass, testSuiteConfig);
+        Deno.stdout.writeSync(new TextEncoder().encode(CoreUtils.formatFinalTestName(testOptions.description, methodName)));
+        if(testStatus.passed) {
+            return;
+        } else {
+            if(!Orange.Core.getOrangeConfig().showExceptions) {
+                throw "";
+            } else {
+                throw testStatus.error;
+            }
+        }
+    }
+}
+
+export const TestProxyAsync = async (testMethod: Function, testSuiteClass: any, testSuiteConfig: Orange.Options, testOptions: Orange.TestOptions, methodName: string) => {
+
+    let testStatus: Orange.TestStatus = getTestStatus(testSuiteClass, testSuiteConfig, testOptions, methodName);
     
     let startTime = Date.now();
 
@@ -51,20 +76,30 @@ export const TestProxy = async (testMethod: Function, testSuiteClass: any, testS
 
     Orange.Core.addTest(testMethod, testStatus);
 
-    return () => {
-        Orange.Core.testsMetadata.numberOfTestsRan++;
-        Orange.Core.updateTestSuiteStats(testSuiteClass, "NumTestsRan");
-        processLastTest(testSuiteClass, testSuiteConfig);
-        Deno.stdout.writeSync(new TextEncoder().encode(CoreUtils.formatFinalTestName(testOptions.description, methodName)));
-        if(testStatus.passed) {
-            return;
-        } else {
-            if(!Orange.Core.getOrangeConfig().showExceptions) {
-                throw "";
-            } else {
-                throw testStatus.error;
-            }
-        }
+    return denoTest(testStatus, testSuiteClass, testSuiteConfig, testOptions, methodName);
+}
+
+
+export const TestProxySync = (testMethod: Function, testSuiteClass: any, testSuiteConfig: Orange.Options, testOptions: Orange.TestOptions, methodName: string) => {
+
+    let testStatus: Orange.TestStatus = getTestStatus(testSuiteClass, testSuiteConfig, testOptions, methodName);
+    let startTime = Date.now();
+
+    setColorEnabled(false);
+    let handler = Orange.Core.getTestSuite(testSuiteClass);
+    try {
+        handler[methodName]();
+        testStatus.passed = true;
+    } catch(error) {
+        testStatus.error = error;
     }
+    setColorEnabled(true);
+
+    testStatus.time = `${Date.now() - startTime}ms`;
+    testStatus.testSuiteName = testSuiteConfig.testSuiteName;
+
+    Orange.Core.addTest(testMethod, testStatus);
+
+    return denoTest(testStatus, testSuiteClass, testSuiteConfig, testOptions, methodName);
 }
 
