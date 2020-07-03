@@ -42,7 +42,7 @@ export class StringTests {
     @Test({
         description: "Elon Musk is Jeff bezos",
     })
-    public elonIsNotJeffBezos() {
+    public async elonIsNotJeffBezos() {
         assert.assertEquals("Elon Musk", "Jeff Bezos");
     }
 

@@ -66,10 +66,11 @@ export class Tests {
         throw new Error("There was an error processing this test. Try again");
     }
 
+    // Will be executed asynchronously as Deno supports the keyword `async` for testing.
     @Test({
         name: "Should pass"
     })
-    public mytest2() {
+    public async mytest2() {
         return true;
     }
 }
