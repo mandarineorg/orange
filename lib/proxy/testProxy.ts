@@ -30,11 +30,15 @@ function getTestStatus(testSuiteClass: any, testSuiteConfig: Orange.Options, tes
         ignore: testOptions.ignore || testSuiteConfig.ignore,
         passed: false,
         error: undefined,
-        testSuiteName: undefined,
+        testSuiteName: testSuiteConfig.testSuiteName,
         time: undefined
     }
 
     return testStatus;
+}
+
+function defineTestStatusTime(testStatus: Orange.TestStatus, startTime: number) {
+    testStatus.time = `${Date.now() - startTime}ms`;
 }
 
 function denoTest(testStatus: Orange.TestStatus, testSuiteClass: any, testSuiteConfig: Orange.Options, testOptions: Orange.TestOptions, methodName: string): Function {
@@ -58,7 +62,6 @@ function denoTest(testStatus: Orange.TestStatus, testSuiteClass: any, testSuiteC
 export const TestProxyAsync = async (testMethod: Function, testSuiteClass: any, testSuiteConfig: Orange.Options, testOptions: Orange.TestOptions, methodName: string) => {
 
     let testStatus: Orange.TestStatus = getTestStatus(testSuiteClass, testSuiteConfig, testOptions, methodName);
-    
     let startTime = Date.now();
 
     setColorEnabled(false);
@@ -71,8 +74,7 @@ export const TestProxyAsync = async (testMethod: Function, testSuiteClass: any, 
     }
     setColorEnabled(true);
 
-    testStatus.time = `${Date.now() - startTime}ms`;
-    testStatus.testSuiteName = testSuiteConfig.testSuiteName;
+    defineTestStatusTime(testStatus, startTime);
 
     Orange.Core.addTest(testMethod, testStatus);
 
@@ -95,8 +97,7 @@ export const TestProxySync = (testMethod: Function, testSuiteClass: any, testSui
     }
     setColorEnabled(true);
 
-    testStatus.time = `${Date.now() - startTime}ms`;
-    testStatus.testSuiteName = testSuiteConfig.testSuiteName;
+    defineTestStatusTime(testStatus, startTime);
 
     Orange.Core.addTest(testMethod, testStatus);
 
