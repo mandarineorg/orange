@@ -2,6 +2,20 @@ import { yellow } from "https://deno.land/std/fmt/colors.ts";
 import { Orange } from "../core.ns.ts";
 import { TestProxyAsync, TestProxySync } from "../proxy/testProxy.ts";
 
+const DefineTest = (target: any) => {
+    Orange.Core.testsMetadata.numberOfTests++;
+    Orange.Core.updateTestSuiteStats(target, "NumTests");
+    Orange.Core.addTestSuite(target);
+}
+
+const ExecuteBeforeHooks = (testSuiteStats: Orange.TestSuiteStats, beforeAllHook: Function, beforeEachHook: Function) => {
+    if(testSuiteStats.numberOfTestsRan == 0 && beforeAllHook) beforeAllHook();
+    if(beforeEachHook) beforeEachHook();
+}
+
+const ExecuteAfterEachHook = (testSuiteStats: Orange.TestSuiteStats, afterEachHook: Function) => {
+    if(afterEachHook && !Orange.Core.isLastTest(testSuiteStats.numberOfTests, testSuiteStats.numberOfTestsIgnored, testSuiteStats.numberOfTestsRan)) afterEachHook();
+}
 
 export const Test = (options: Orange.TestOptions) => {
     return (target: any, propertyKey: string) => {
@@ -10,9 +24,7 @@ export const Test = (options: Orange.TestOptions) => {
             [${yellow(testName)}]`;
             
         // Define test  
-        Orange.Core.testsMetadata.numberOfTests++;
-        Orange.Core.updateTestSuiteStats(target, "NumTests");
-        Orange.Core.addTestSuite(target);
+        DefineTest(target);
 
         let testMethod = Orange.Core.getTestSuite(target)[propertyKey];
         let testSuiteConfig = Orange.Core.getTestSuiteConfig(target);
@@ -22,6 +34,7 @@ export const Test = (options: Orange.TestOptions) => {
         let afterEachHook: Function = testSuiteConfig.hooks?.afterEach;
 
         let ignore = options.ignore || testSuiteConfig.ignore; 
+
         if(ignore)  {
             Orange.Core.updateTestSuiteStats(target, "NumTestsIgnored");
             Orange.Core.testsMetadata.numberOfTestsIgnored++;
@@ -31,23 +44,16 @@ export const Test = (options: Orange.TestOptions) => {
         let testFunction: () => void | Promise<void>;
 
         if(testMethod instanceof Orange.AsyncFunction) {
-            console.log("It's async");
             testFunction = async () => {
-                if(testSuiteStats.numberOfTestsRan == 0 && beforeAllHook) beforeAllHook();
-                if(beforeEachHook) beforeEachHook();
-
+                ExecuteBeforeHooks(testSuiteStats, beforeAllHook, beforeEachHook);
                 (await TestProxyAsync(testMethod, target, testSuiteConfig, options, propertyKey))();
-
-                if(afterEachHook && !Orange.Core.isLastTest(testSuiteStats.numberOfTests, testSuiteStats.numberOfTestsIgnored, testSuiteStats.numberOfTestsRan)) afterEachHook();
+                ExecuteAfterEachHook(testSuiteStats, afterEachHook);
             };
         } else {
             testFunction = () => {
-                if(testSuiteStats.numberOfTestsRan == 0 && beforeAllHook) beforeAllHook();
-                if(beforeEachHook) beforeEachHook();
-
+                ExecuteBeforeHooks(testSuiteStats, beforeAllHook, beforeEachHook);
                 TestProxySync(testMethod, target, testSuiteConfig, options, propertyKey)();
-
-                if(afterEachHook && !Orange.Core.isLastTest(testSuiteStats.numberOfTests, testSuiteStats.numberOfTestsIgnored, testSuiteStats.numberOfTestsRan)) afterEachHook();
+                ExecuteAfterEachHook(testSuiteStats, afterEachHook);
             }
         }
 
