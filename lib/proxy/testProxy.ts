@@ -1,4 +1,4 @@
-import { setColorEnabled } from "https://deno.land/std/fmt/colors.ts";
+import { setColorEnabled } from "https://deno.land/std@0.61.0/fmt/colors.ts";
 import { Orange } from "../core.ns.ts";
 import { CoreUtils } from "../utils/core.utils.ts";
 
