@@ -1,4 +1,4 @@
-import { bold, yellow } from "https://deno.land/std/fmt/colors.ts";
+import { bold, yellow } from "https://deno.land/std@0.61.0/fmt/colors.ts";
 import { Table } from "./table.ts";
 import { CoreUtils } from "./utils/core.utils.ts";
 export namespace Orange {
