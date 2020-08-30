@@ -698,7 +698,7 @@ export const Table = (data: unknown, inString: boolean, useQuotes: boolean, cust
     }
 
     if (data === null || typeof data !== "object") {
-      this.log(data);
+      console.log(data);
       return;
     }
 
