@@ -698,7 +698,8 @@ export const Table = (data: unknown, inString: boolean, useQuotes: boolean, cust
     }
 
     if (data === null || typeof data !== "object") {
-      return this.log(data);
+      this.log(data);
+      return;
     }
 
     const objectValues: { [key: string]: string[] } = {};
@@ -708,7 +709,7 @@ export const Table = (data: unknown, inString: boolean, useQuotes: boolean, cust
     const stringifyValue = (value: unknown): string =>
       (useQuotes) ? stringifyWithQuotes(value, new Set<unknown>(), 0, 1) : stringify(value, new Set<unknown>(), 0, 1);
     const toTable = (header: string[], body: string[][]): void | string =>
-      (inString) ? cliTable(header, body) : this.log(cliTable(header, body));
+      (inString) ? cliTable(header, body) : console.log(cliTable(header, body));
     const createColumn = (value: unknown, shift?: number): string[] => [
       ...(shift ? [...new Array(shift)].map((): string => "") : []),
       stringifyValue(value),
