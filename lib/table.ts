@@ -538,9 +538,9 @@ function createObjectString(
   value: {},
   ...args: [ConsoleContext, number, number]
 ): string {
-  if (customInspect in value && typeof value[customInspect] === "function") {
+  if (customInspect in value && typeof (<any>value)[customInspect] === "function") {
     try {
-      return String(value[customInspect]!());
+      return String((<any>value)[customInspect]!());
     } catch {}
   }
   if (value instanceof Error) {

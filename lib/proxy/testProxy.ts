@@ -29,9 +29,9 @@ function getTestStatus(testSuiteClass: any, testSuiteConfig: Orange.Options, tes
         description: testOptions.description,
         ignore: testOptions.ignore || testSuiteConfig.ignore,
         passed: false,
-        error: undefined,
-        testSuiteName: testSuiteConfig.testSuiteName,
-        time: undefined
+        error: <any><unknown>undefined,
+        testSuiteName: <string>testSuiteConfig.testSuiteName,
+        time: <any><unknown>undefined
     }
 
     return testStatus;
@@ -46,7 +46,7 @@ function denoTest(testStatus: Orange.TestStatus, testSuiteClass: any, testSuiteC
         Orange.Core.testsMetadata.numberOfTestsRan++;
         Orange.Core.updateTestSuiteStats(testSuiteClass, "NumTestsRan");
         processLastTest(testSuiteClass, testSuiteConfig);
-        Deno.stdout.writeSync(new TextEncoder().encode(CoreUtils.formatFinalTestName(testOptions.description, methodName)));
+        Deno.stdout.writeSync(new TextEncoder().encode(CoreUtils.formatFinalTestName(<string>testOptions.description, methodName)));
         if(testStatus.passed) {
             return;
         } else {

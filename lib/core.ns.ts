@@ -125,21 +125,25 @@ export namespace Orange {
                 });
             }
 
-            switch(statToUpdate) {
-                case "NumTests": 
-                this.testSuitesMetadata.get(testSuiteClass).numberOfTests++;
-                break;
-                case "NumTestsRan": 
-                this.testSuitesMetadata.get(testSuiteClass).numberOfTestsRan++;
-                break;
-                case "NumTestsIgnored": 
-                this.testSuitesMetadata.get(testSuiteClass).numberOfTestsIgnored++;
-                break;
+            const testSuiteMetadata = this.testSuitesMetadata.get(testSuiteClass);
+            if(testSuiteMetadata) {
+                switch(statToUpdate) {
+                    case "NumTests": 
+                    testSuiteMetadata.numberOfTests++;
+                    break;
+                    case "NumTestsRan": 
+                    testSuiteMetadata.numberOfTestsRan++;
+                    break;
+                    case "NumTestsIgnored": 
+                    testSuiteMetadata.numberOfTestsIgnored++;
+                    break;
+                }
+                this.testSuitesMetadata.set(testSuiteClass, testSuiteMetadata);
             }
         }
 
         public static getTestSuiteStats(testSuiteClass: any): TestSuiteStats {
-            return this.testSuitesMetadata.get(testSuiteClass);
+            return this.testSuitesMetadata.get(testSuiteClass) || <any><unknown>undefined;
         }
 
         public static getTestSuiteConfig(classSource: any): Options {
@@ -183,7 +187,7 @@ export namespace Orange {
                 if(!testSuiteConfig.generateReport) return;
                 let tableContent = this.getTableContent(item);
                 tableContent = tableContent.map((item) => {
-                    item["Error Message"] = item["Error Message"].replace(/(\r\n|\n|\r)/gm, "");
+                    item["Error Message"] = (<any>item)["Error Message"].replace(/(\r\n|\n|\r)/gm, "");
                     return item;
                 })
                 let table = Table(tableContent, true, false, "Test ID");
@@ -226,7 +230,7 @@ export namespace Orange {
 
         public static getTestingFolder() {
             let config = this.getOrangeConfig();
-            let testFolder = this.parseKeywords(config.testsFolder);
+            let testFolder = this.parseKeywords(<string>config.testsFolder);
             if(!CoreUtils.fileDirExists(testFolder)) Deno.mkdirSync(testFolder, { recursive: true });
             return testFolder;
         }

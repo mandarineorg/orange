@@ -1,4 +1,4 @@
-import { green, gray, bold } from "https://deno.land/std@0.61.0/fmt/colors.ts";
+import { green, gray, bold } from "https://deno.land/std@0.71.0/fmt/colors.ts";
 
 export class CoreUtils {
 

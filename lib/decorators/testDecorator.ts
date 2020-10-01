@@ -1,4 +1,4 @@
-import { yellow } from "https://deno.land/std@0.61.0/fmt/colors.ts";
+import { yellow } from "https://deno.land/std@0.71.0/fmt/colors.ts";
 import { Orange } from "../core.ns.ts";
 import { TestProxyAsync, TestProxySync } from "../proxy/testProxy.ts";
 
@@ -29,9 +29,9 @@ export const Test = (options: Orange.TestOptions) => {
         let testMethod = Orange.Core.getTestSuite(target)[propertyKey];
         let testSuiteConfig = Orange.Core.getTestSuiteConfig(target);
 
-        let beforeAllHook: Function = testSuiteConfig.hooks?.beforeAll;
-        let beforeEachHook: Function = testSuiteConfig.hooks?.beforeEach;
-        let afterEachHook: Function = testSuiteConfig.hooks?.afterEach;
+        let beforeAllHook: Function | undefined = testSuiteConfig.hooks?.beforeAll;
+        let beforeEachHook: Function | undefined = testSuiteConfig.hooks?.beforeEach;
+        let afterEachHook: Function | undefined = testSuiteConfig.hooks?.afterEach;
 
         let ignore = options.ignore || testSuiteConfig.ignore; 
 
@@ -45,15 +45,15 @@ export const Test = (options: Orange.TestOptions) => {
 
         if(testMethod instanceof Orange.AsyncFunction) {
             testFunction = async () => {
-                ExecuteBeforeHooks(testSuiteStats, beforeAllHook, beforeEachHook);
+                ExecuteBeforeHooks(testSuiteStats, <Function>beforeAllHook, <Function> beforeEachHook);
                 (await TestProxyAsync(testMethod, target, testSuiteConfig, options, propertyKey))();
-                ExecuteAfterEachHook(testSuiteStats, afterEachHook);
+                ExecuteAfterEachHook(testSuiteStats, <Function>afterEachHook);
             };
         } else {
             testFunction = () => {
-                ExecuteBeforeHooks(testSuiteStats, beforeAllHook, beforeEachHook);
+                ExecuteBeforeHooks(testSuiteStats, <Function> beforeAllHook, <Function> beforeEachHook);
                 TestProxySync(testMethod, target, testSuiteConfig, options, propertyKey)();
-                ExecuteAfterEachHook(testSuiteStats, afterEachHook);
+                ExecuteAfterEachHook(testSuiteStats, <Function> afterEachHook);
             }
         }
 

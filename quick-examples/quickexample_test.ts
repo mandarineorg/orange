@@ -1,4 +1,4 @@
-import * as assert from "https://deno.land/std@v0.58.0/testing/asserts.ts";
+import * as assert from "https://deno.land/std@v0.71.0/testing/asserts.ts";
 import { Orange } from "../lib/core.ns.ts";
 import { Test } from "../lib/decorators/testDecorator.ts";
 
