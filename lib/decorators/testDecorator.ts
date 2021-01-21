@@ -1,4 +1,4 @@
-import { yellow } from "https://deno.land/std@0.71.0/fmt/colors.ts";
+import { yellow } from "https://deno.land/std@0.84.0/fmt/colors.ts";
 import { Orange } from "../core.ns.ts";
 import { TestProxyAsync, TestProxySync } from "../proxy/testProxy.ts";
 

@@ -11,7 +11,7 @@ import {
   green,
   magenta,
   bold,
-} from "https://deno.land/std@0.61.0/fmt/colors.ts";
+} from "https://deno.land/std@0.84.0/fmt/colors.ts";
 
 type ConsoleContext = Set<unknown>;
 type InspectOptions = Partial<{
