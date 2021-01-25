@@ -1,6 +1,4 @@
 // Copyright 2018-2020 the Deno authors. All rights reserved. MIT license.
-import { isInvalidDate, isTypedArray, TypedArray } from "https://raw.githubusercontent.com/denoland/deno/3314b463215a8e59ec46d722adb70a22cd3ef832/cli/js/web/util.ts";
-import { cliTable } from "https://raw.githubusercontent.com/denoland/deno/3314b463215a8e59ec46d722adb70a22cd3ef832/cli/js/web/console_table.ts";
 
 import {
   stripColor,
@@ -12,6 +10,7 @@ import {
   magenta,
   bold,
 } from "https://deno.land/std@0.84.0/fmt/colors.ts";
+import { cliTable, isInvalidDate, isTypedArray , TypedArray} from "./utils/table.ts";
 
 type ConsoleContext = Set<unknown>;
 type InspectOptions = Partial<{
